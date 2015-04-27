@@ -14,28 +14,28 @@ class Calendar(object):
         '''
         Constructor
         '''
-        self.today = 1
+        self.month = 0
         self.schedule = dict()
         
     def addPlan(self, plan):
-        day = plan[0]
+        month = plan[0]
         event = plan[1]
-        if (day in self.schedule):
-            self.schedule[day].append(event)
+        if (month in self.schedule):
+            self.schedule[month].append(event)
         else:
-            self.schedule[day] = list()
-            self.schedule[day].append(event)
+            self.schedule[month] = list()
+            self.schedule[month].append(event)
             
     def addPlans(self, plans):
         pass
             
     def getTodaysEvents(self):
-        if(self.today in self.schedule):
-            events = self.schedule[self.today]
-            del self.schedule[self.today]
+        if(self.month in self.schedule):
+            events = self.schedule[self.month]
+            del self.schedule[self.month]
             return events
         else:
             return list()
         
-    def nextDay(self):
-        self.today += 1
+    def nextMonth(self):
+        self.month += 1

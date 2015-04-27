@@ -10,7 +10,7 @@ class Person(object):
     '''
 
 
-    def __init__(self, birthday, dad, mom, gender, name):
+    def __init__(self, day, dad, mom, gender, name):
         '''
         Constructor
         '''
@@ -18,9 +18,23 @@ class Person(object):
         self.mom = mom
         self.name = name
         self.gender = gender
-        self.birthday = birthday
+        self.birthday = day
+        self.deathday = None
         self.spouse = None
-        self.pregnant = None
+        self.pregnant = None    #pID of father
+        self.kids = list()
         
     def setSpouse(self, spouse):
         self.spouse = spouse
+        
+    def getSpouse(self):
+        return self.spouse
+    
+    def addKid(self, pID):
+        self.kids.append(pID)
+        
+    def numKids(self):
+        return len(self.kids)
+        
+    def death(self, day):
+        self.deathday = day

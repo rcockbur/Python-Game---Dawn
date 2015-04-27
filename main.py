@@ -1,10 +1,16 @@
-import pygame, people, calendar
+import pygame, people, calendar, menu, random
 from pygame import display, key, time, USEREVENT
 
 
 pygame.init() 
 display.init()
-display.set_mode((200,200))
+display.set_mode((640,480))
+display_rect = display.get_surface().get_rect()
+MENU_WIDTH = 200
+M = menu.Menu(display_rect, MENU_WIDTH)
+display.get_surface().blit(M.getSurface(), (display_rect.width - MENU_WIDTH, 0))
+
+pygame.display.flip()
 
 clock = time.Clock()
 timeStamp = time.get_ticks()
@@ -19,32 +25,53 @@ ADULTHOOD = USEREVENT + 5
 PREGNANT = USEREVENT + 6
 CREATE = USEREVENT + 7
 
-DAYS_AS_CHILD = 18
-DAYS_PREGNANT = 1
-DAYS_TO_CONCEIVE = 1
+MONTHS_AS_CHILD = 12 * 16
+MONTHS_PREGNANT = 9
+MAXLIFE = 12 * 80
+MAXCONCEIVE = 12*5
 
 detailsAdam = {"mID": None, "fID": None, "gender": "male", "name": "Adam"}
 createAdam = pygame.event.Event(CREATE, detailsAdam)
-C.addPlan((1, createAdam))
+C.addPlan((0, createAdam))
 
 detailsEve = {"mID": None, "fID": None, "gender": "female", "name": "Eve"}
 createEve = pygame.event.Event(CREATE, detailsEve)
-C.addPlan((2, createEve))
+C.addPlan((0, createEve))
+
+month = {0: "Jan", 1: "Feb", 2: "Mar", 3: "Apr", 4: "May", 5: "June", 6: "July", 7: "Aug", 8: "Sept", 9: "Oct", 10: "Nov", 11: "Dec"}
+
+def getDate():
+    return "Year: " + str(C.month / 12) + " Month: " + month[C.month % 12] 
+
+def lifeSpan():
+    return random.randint(1, MAXLIFE)
+
+def monthsToConveive():
+    return random.randint(1, 12*5)
 
 def planAdulthood(pID):
     detailsAdult = {"pID": pID}
     eventAdult = pygame.event.Event(ADULTHOOD, detailsAdult)
-    C.addPlan((C.today + DAYS_AS_CHILD, eventAdult))
+    C.addPlan((C.month + MONTHS_AS_CHILD, eventAdult))
     
 def planBirth(mID, fID):
     detailsBirth = {"fID": fID, "mID": mID, "gender": None, "name": None}
     eventBirth = pygame.event.Event(BIRTH, detailsBirth)
-    C.addPlan((C.today + DAYS_PREGNANT, eventBirth))
+    C.addPlan((C.month + MONTHS_PREGNANT, eventBirth))
     
 def planPregnancy(mID, fID):
     detailsPregnancy = {"fID": fID, "mID": mID}
     eventPregnancy = pygame.event.Event(PREGNANT, detailsPregnancy)
-    C.addPlan((C.today + DAYS_TO_CONCEIVE, eventPregnancy))
+    C.addPlan((C.month + monthsToConveive(), eventPregnancy))
+    
+def planDeath(pID, maxLife):
+    detailsDeath = {"pID": pID}
+    eventDeath = pygame.event.Event(DEATH, detailsDeath)
+    if (maxLife == True):
+        C.addPlan((C.month + MAXLIFE, eventDeath))
+    else:
+        C.addPlan((C.month + lifeSpan(), eventDeath))
+    
     
 def gender(pID):
     return P.everyone[pID].gender
@@ -68,44 +95,68 @@ while(mainLoop):
     for event in pygame.event.get(pygame.KEYDOWN):
         if event.key == pygame.K_c and ctrl_held:
             pygame.quit()
-            quit()                         
+            quit()
+    for event in pygame.event.get(pygame.MOUSEBUTTONDOWN):
+        print (event.pos)
+        print (event.button)       
+                       
     pygame.event.pump()
     
     if(time.get_ticks()-timeStamp >= 3000):
-        print("Day " + str(C.today))
+        print(getDate())
+        #print("Month " + str(C.month))
+        
         for event in C.getTodaysEvents():
             
             if event.type == CREATE:
-                pID = P.birth(C.today, event.mID, event.fID, event.gender, event.name)
+                pID = P.birth(C.month, event.mID, event.fID, event.gender, event.name)
                 planAdulthood(pID)
+                planDeath(pID, True)
             
             if event.type == BIRTH:
+                if (event.fID not in P.living):
+                    continue
+                pID = P.birth(C.month, event.mID, event.fID, event.gender, event.name)
+                planAdulthood(pID)
                 if (event.mID not in P.living):
                     continue
-                pID = P.birth(C.today, event.mID, event.fID, event.gender, event.name)
-                planAdulthood(pID)
+                planPregnancy(event.mID, event.fID)
+                planDeath(pID, False)
                 
             if event.type == ADULTHOOD:
                 if (event.pID not in P.living):
                     continue
-                partnerID = P.adulthood(event.pID)
-                if (partnerID != None):
+                P.adulthood(event.pID)
+                spouse = P.findSpouse(event.pID)
+                if (spouse != None):
                     if (gender(event.pID) == "male"):
-                        P.marriage(event.pID, partnerID)
-                        planPregnancy(event.pID, partnerID)
+                        P.marriage(event.pID, spouse)
+                        planPregnancy(event.pID, spouse)
                     else:
-                        P.marriage(partnerID, event.pID)
-                        planPregnancy(partnerID, event.pID)
+                        P.marriage(spouse, event.pID)
+                        planPregnancy(spouse, event.pID)
+                
                 
             if event.type == PREGNANT:
                 if (event.mID not in P.living):
                     continue
-                P.pregnant(event.mID, event.fID)
-                planBirth(event.mID, event.fID)            
+                if (P.pregnant(event.mID, event.fID)):
+                    planBirth(event.mID, event.fID)            
                 
             if event.type == DEATH:
-                pass
+                if (event.pID not in P.living):
+                    continue
+                pID = P.death(event.pID, C.month)
+                if (pID != None):
+                    spouse = P.findSpouse(pID)
+                    if (spouse != None):
+                        if (gender(pID) == "male"):
+                            P.marriage(pID, spouse)
+                            planPregnancy(pID, spouse)
+                        else:
+                            P.marriage(spouse, pID)
+                            planPregnancy(spouse, pID)
         
-        C.nextDay()
+        C.nextMonth()
         timeStamp = time.get_ticks()
         
