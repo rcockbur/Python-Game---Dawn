@@ -1,21 +1,8 @@
 import pygame, people, calendar, menu, random
 from pygame import display, key, time, USEREVENT
+from pygame.rect import Rect
 
-
-pygame.init() 
-display.init()
-display.set_mode((640,480))
-display_rect = display.get_surface().get_rect()
 MENU_WIDTH = 200
-M = menu.Menu(display_rect, MENU_WIDTH)
-display.get_surface().blit(M.getSurface(), (display_rect.width - MENU_WIDTH, 0))
-
-pygame.display.flip()
-
-clock = time.Clock()
-timeStamp = time.get_ticks()
-P = people.People()
-C = calendar.Calendar()
 
 MARRIAGE = USEREVENT + 1
 BIRTHDAY = USEREVENT + 2
@@ -29,6 +16,24 @@ MONTHS_AS_CHILD = 12 * 16
 MONTHS_PREGNANT = 9
 MAXLIFE = 12 * 80
 MAXCONCEIVE = 12*5
+
+pygame.init() 
+display.init()
+display.set_mode((640,480))
+display_rect = display.get_surface().get_rect()
+
+M = menu.Menu(display_rect, MENU_WIDTH)
+menuOffsetX = display_rect.width - MENU_WIDTH
+menuRect = Rect(menuOffsetX, 0, MENU_WIDTH, display_rect.height)
+
+
+display.get_surface().blit(M.getSurface(), (display_rect.width - MENU_WIDTH, 0))
+pygame.display.flip()
+
+clock = time.Clock()
+timeStamp = time.get_ticks()
+P = people.People()
+C = calendar.Calendar()
 
 detailsAdam = {"mID": None, "fID": None, "gender": "male", "name": "Adam"}
 createAdam = pygame.event.Event(CREATE, detailsAdam)
@@ -89,20 +94,29 @@ while(mainLoop):
     ctrl_held = pressed[pygame.K_LCTRL] or pressed[pygame.K_RCTRL]
     
     #process controls
-    for event in pygame.event.get(pygame.QUIT):
-        pygame.quit()
-        quit()                       
-    for event in pygame.event.get(pygame.KEYDOWN):
-        if event.key == pygame.K_c and ctrl_held:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
             pygame.quit()
-            quit()
-    for event in pygame.event.get(pygame.MOUSEBUTTONDOWN):
-        print (event.pos)
-        print (event.button)       
+            quit()                       
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_c and ctrl_held:
+                pygame.quit()
+                quit()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if menuRect.collidepoint(event.pos):
+                print("menu")
+                buttonText = M.getButton(event.pos[0] - menuOffsetX, event.pos[1])
+                if buttonText != None:
+                    print(buttonText)
+            #print (event.pos)
+            #print (event.button)       
                        
     pygame.event.pump()
+#     if pygame.event.peek(): print("yes")
+#     else: print("no")
     
     if(time.get_ticks()-timeStamp >= 3000):
+        #if pygame.event.peek(): print("before"),
         print(getDate())
         #print("Month " + str(C.month))
         
@@ -113,7 +127,7 @@ while(mainLoop):
                 planAdulthood(pID)
                 planDeath(pID, True)
             
-            if event.type == BIRTH:
+            elif event.type == BIRTH:
                 if (event.fID not in P.living):
                     continue
                 pID = P.birth(C.month, event.mID, event.fID, event.gender, event.name)
@@ -123,7 +137,7 @@ while(mainLoop):
                 planPregnancy(event.mID, event.fID)
                 planDeath(pID, False)
                 
-            if event.type == ADULTHOOD:
+            elif event.type == ADULTHOOD:
                 if (event.pID not in P.living):
                     continue
                 P.adulthood(event.pID)
@@ -137,13 +151,13 @@ while(mainLoop):
                         planPregnancy(spouse, event.pID)
                 
                 
-            if event.type == PREGNANT:
+            elif event.type == PREGNANT:
                 if (event.mID not in P.living):
                     continue
                 if (P.pregnant(event.mID, event.fID)):
                     planBirth(event.mID, event.fID)            
                 
-            if event.type == DEATH:
+            elif event.type == DEATH:
                 if (event.pID not in P.living):
                     continue
                 pID = P.death(event.pID, C.month)
@@ -159,4 +173,5 @@ while(mainLoop):
         
         C.nextMonth()
         timeStamp = time.get_ticks()
+        #if pygame.event.peek(): print("after")
         
