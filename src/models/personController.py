@@ -1,26 +1,21 @@
+import person, random
 '''
-Created on Apr 18, 2015
+Created on Aug 6, 2015
 
 @author: Ross
 '''
-import person, random
 
-FEMALE_NAMES = ("Joan", "Elizabeth", "Matilda", "Mary", "Emily", "Arianna", "Brianne", "Claire", "Heather", "Leah", "Laura", "Irene", "Stephanie", "Constance", "Catelyn", "Lisa",
-                 "Alaina", "Bethany", "Dana", "Chantelle", "Elsa", "Gina", "Gabrielle", "Gwen", "Hailey", "Lisa", "Rose", "Samantha")
-MALE_NAMES = ("Adam", "Brian", "John", "Christopher", "Richard", "Henry", "William", "Edward", "David", "Patrcick", "Stephen", "Andrew", "Daniel", "Michael", "Mathew", "Alexander",
+class PersonController(object):
+    '''
+    Constructor
+    '''
+    FEMALE_NAMES = ("Joan", "Elizabeth", "Matilda", "Mary", "Emily", "Arianna", "Brianne", "Claire", "Heather", "Leah", "Laura", "Irene", "Stephanie", "Constance", "Catelyn", "Lisa",
+             "Alaina", "Bethany", "Dana", "Chantelle", "Elsa", "Gina", "Gabrielle", "Gwen", "Hailey", "Lisa", "Rose", "Samantha")
+    MALE_NAMES = ("Adam", "Brian", "John", "Christopher", "Richard", "Henry", "William", "Edward", "David", "Patrcick", "Stephen", "Andrew", "Daniel", "Michael", "Mathew", "Alexander",
               "Edmond", "Ross", "Timothy", "Nickolas", "Jordan", "Jeffery", "Zachary", "Benjaman", "Thomas", "Darren", "Marcus", "Robbert")
-MAX_KIDS = 6
-    
-class People(object):
-    '''
-    classdocs
-    '''
-
+    MAX_KIDS = 6
 
     def __init__(self):
-        '''
-        Constructor
-        '''
         self.everyone = dict()  #all people, living and dead
         self.living = set()     #all living people
         self.adults = set()     #all adults, living and dead
@@ -28,42 +23,29 @@ class People(object):
         self.count = 0          #number of people, living and dead
         random.seed()
         
-    def birth(self, day, mID, fID, gender=None, name = None):
+    def __getitem__(self, i):
+        return self.everyone[i]
         
-#         if (dad == None and gender == "female"):
-#             name = "Eve"
-#         if (dad == None and gender == "male"):
-#             name = "Adam"
-            
+    def birth(self, day, mID, fID, gender=None, name = None):
         if (gender == None):
             gender = self.randomGender()
         if (name == None):
             name = self.randomName(gender)
-            
-        self.everyone[self.count] = person.Person(day, mID, fID, gender, name)
+        self.everyone[self.count] = person.Person(self.count, day, mID, fID, gender, name)
         self.living.add(self.count)
-        
         if (mID != None):
             self.everyone[mID].addKid(self.count)
             self.everyone[fID].addKid(self.count)
-            
         self.count += 1
-        
-        if (gender == "male"):
-            title = "boy"
-        else:
-            title = "girl"
-            
-        if (mID == None):
-            print("A " + title + " named " + name + " was born"),
-        else:
-            print(self.everyone[mID].name + " and " + self.everyone[fID].name + " had a " + title + " named " + name),
+        if (gender == "male"): title = "boy"
+        else: title = "girl"            
+        if (mID == None): print("A " + title + " named " + name + " was born"),
+        else: print(self.everyone[mID].name + " and " + self.everyone[fID].name + " had a " + title + " named " + name),
         print(" Population=" + str(len(self.living)))
-            
         return (self.count - 1)
             
     def pregnant(self, fID, mID):
-        if (self.everyone[fID].numKids() < MAX_KIDS):
+        if (self.everyone[fID].numKids() < self.MAX_KIDS):
             self.everyone[fID].pregnant = mID
             return True
         return False
@@ -99,7 +81,6 @@ class People(object):
         self.living.remove(pID)
         print(self.everyone[pID].name + " has died"), 
         print(" Population=" + str(len(self.living)))
-        
         return spouse
             
     
@@ -108,6 +89,7 @@ class People(object):
     
     def randomName(self, gender):
         if (gender == "male"):
-            return random.choice(MALE_NAMES)
+            return random.choice(self.MALE_NAMES)
         else:
-            return random.choice(FEMALE_NAMES)
+            return random.choice(self.FEMALE_NAMES)
+        

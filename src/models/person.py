@@ -1,19 +1,7 @@
-'''
-Created on Apr 18, 2015
-
-@author: Ross
-'''
-
 class Person(object):
-    '''
-    classdocs
-    '''
 
-
-    def __init__(self, day, dad, mom, gender, name):
-        '''
-        Constructor
-        '''
+    def __init__(self, ID, day, dad, mom, gender, name):
+        self.ID = ID
         self.dad = dad
         self.mom = mom
         self.name = name
@@ -21,20 +9,22 @@ class Person(object):
         self.birthday = day
         self.deathday = None
         self.spouse = None
-        self.pregnant = None    #pID of father
+        self.pregnant = None    #pID of the father
         self.kids = list()
         
-    def setSpouse(self, spouse):
-        self.spouse = spouse
-        
+    def getID(self, ID):
+        return self.ID
     def getSpouse(self):
         return self.spouse
-    
+    def setSpouse(self, spouse):
+        self.spouse = spouse
+    def getGender(self):
+        return self.gender
+    def setGender(self, gender):
+        self.gender = gender
     def addKid(self, pID):
-        self.kids.append(pID)
-        
+        self.kids.append(pID) 
     def numKids(self):
         return len(self.kids)
-        
     def death(self, day):
         self.deathday = day
