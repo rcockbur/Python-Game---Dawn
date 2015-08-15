@@ -1,9 +1,9 @@
 import pygame
-import numpy as np
 
 # make class Background
 
-class TileSet(object):
+class tileSet(object):
+    
     def __init__(self, fileName, columns, rows):
         self.sheet = pygame.image.load(fileName)
         self.columns = columns
@@ -22,9 +22,3 @@ class TileSet(object):
     
     def getTile(self, x, y):
         return self.tiles[x][y]
-#     
-# class Tile(object):
-#     tileSet = TileSet
-#     def __init__(self, x, y):
-#         
-#         

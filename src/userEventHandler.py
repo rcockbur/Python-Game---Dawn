@@ -1,6 +1,6 @@
 # from pygame import USEREVENT
-from models.calendar_ import Calendar
-from models.personController import PersonController
+from eventController import eventController
+from personController import personController
 
 MARRIAGE = 1
 BIRTHDAY = 2
@@ -17,61 +17,61 @@ MAXCONCEIVE = 12*5
 
 class UserEventHandler(object):   
     def __init__(self):
-        self.C = Calendar()
-        self.P = PersonController()
+        self.EC = eventController()
+        self.PC = personController()
     
     def handleEvents(self):
-        print(self.C.month)
-        for event in self.C.getTodaysEvents():
+        print(self.EC.month)
+        for event in self.EC.getTodaysEvents():
 
             if event[0] == CREATE:
-                pID = self.P.birth(self.C.month, event[1]['mID'], event[1]['fID'], event[1]['gender'], event[1]['name'])
-                self.C.planAdulthood(pID)
-                self.C.planDeath(pID, True)   
+                pID = self.PC.birth(self.EC.month, event[1]['mID'], event[1]['fID'], event[1]['gender'], event[1]['name'])
+                self.EC.planAdulthood(pID)
+                self.EC.planDeath(pID, True)   
             
             elif event[0] == BIRTH:
-                if (event[1]['fID'] not in self.P.living):
+                if (event[1]['fID'] not in self.PC.living):
                     continue
-                pID = self.P.birth(self.C.month, event[1]['mID'], event[1]['fID'], event[1]['gender'], event[1]['name'])
-                self.C.planAdulthood(pID)
-                if (event[1]['mID'] not in self.P.living):
+                pID = self.PC.birth(self.EC.month, event[1]['mID'], event[1]['fID'], event[1]['gender'], event[1]['name'])
+                self.EC.planAdulthood(pID)
+                if (event[1]['mID'] not in self.PC.living):
                     continue
-                self.C.planPregnancy(event[1]['mID'], event[1]['fID'])
-                self.C.planDeath(pID, False)
+                self.EC.planPregnancy(event[1]['mID'], event[1]['fID'])
+                self.EC.planDeath(pID, False)
                 
             elif event[0] == ADULTHOOD:
-                if (event[1]['pID'] not in self.P.living):
+                if (event[1]['pID'] not in self.PC.living):
                     continue
-                self.P.adulthood(event[1]['pID'])
-                spouse = self.P.findSpouse(event[1]['pID'])
+                self.PC.adulthood(event[1]['pID'])
+                spouse = self.PC.findSpouse(event[1]['pID'])
                 if (spouse != None):
-                    if (self.P[event[1]['pID']].getGender() == "male"):
-                        self.P.marriage(event[1]['pID'], spouse)
-                        self.C.planPregnancy(event[1]['pID'], spouse)
+                    if (self.PC[event[1]['pID']].getGender() == "male"):
+                        self.PC.marriage(event[1]['pID'], spouse)
+                        self.EC.planPregnancy(event[1]['pID'], spouse)
                     else:
-                        self.P.marriage(spouse, event[1]['pID'])
-                        self.C.planPregnancy(spouse, event[1]['pID'])
+                        self.PC.marriage(spouse, event[1]['pID'])
+                        self.EC.planPregnancy(spouse, event[1]['pID'])
                       
             elif event[0] == PREGNANT:
-                if (event[1]['mID'] not in self.P.living):
+                if (event[1]['mID'] not in self.PC.living):
                     continue
-                if (self.P.pregnant(event[1]['mID'], event[1]['fID'])):
-                    self.C.planBirth(event[1]['mID'], event[1]['fID'])            
+                if (self.PC.pregnant(event[1]['mID'], event[1]['fID'])):
+                    self.EC.planBirth(event[1]['mID'], event[1]['fID'])            
                 
             elif event[0] == DEATH:
-                if (event[1]['pID'] not in self.P.living):
+                if (event[1]['pID'] not in self.PC.living):
                     continue
-                pID = self.P.death(event[1]['pID'], self.C.month)
+                pID = self.PC.death(event[1]['pID'], self.EC.month)
                 if (pID != None):
-                    spouse = self.P.findSpouse(pID)
+                    spouse = self.PC.findSpouse(pID)
                     if (spouse != None):
-                        if (self.P[pID].getGender() == "male"):
-                            self.P.marriage(pID, spouse)
-                            self.C.planPregnancy(pID, spouse)
+                        if (self.PC[pID].getGender() == "male"):
+                            self.PC.marriage(pID, spouse)
+                            self.EC.planPregnancy(pID, spouse)
                         else:
-                            self.P.marriage(spouse, pID)
-                            self.C.planPregnancy(spouse, pID)
+                            self.PC.marriage(spouse, pID)
+                            self.EC.planPregnancy(spouse, pID)
                             
-        self.C.nextMonth()
+        self.EC.nextMonth()
         
         

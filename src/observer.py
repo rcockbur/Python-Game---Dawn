@@ -1,4 +1,4 @@
-class Obserber(object):
+class Observer(object):
     def __init__(self):
         self.viewList = list()
         

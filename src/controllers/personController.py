@@ -1,14 +1,7 @@
 import person, random
-'''
-Created on Aug 6, 2015
 
-@author: Ross
-'''
-
-class PersonController(object):
-    '''
-    Constructor
-    '''
+class personController(object):
+    
     FEMALE_NAMES = ("Joan", "Elizabeth", "Matilda", "Mary", "Emily", "Arianna", "Brianne", "Claire", "Heather", "Leah", "Laura", "Irene", "Stephanie", "Constance", "Catelyn", "Lisa",
              "Alaina", "Bethany", "Dana", "Chantelle", "Elsa", "Gina", "Gabrielle", "Gwen", "Hailey", "Lisa", "Rose", "Samantha")
     MALE_NAMES = ("Adam", "Brian", "John", "Christopher", "Richard", "Henry", "William", "Edward", "David", "Patrcick", "Stephen", "Andrew", "Daniel", "Michael", "Mathew", "Alexander",
