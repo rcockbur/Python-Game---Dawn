@@ -1,14 +1,17 @@
 import pygame
 import menu
 import angband
+from userEventHandler import UserEventHandler
 
-class view(object):
+class gameView(object):
     
     MENU_WIDTH = 200
     DISPLAY_SIZE = (640,640)
     
     def __init__(self):
         pygame.display.init()
+        self.UEH = UserEventHandler()
+        self.oldTime = pygame.time.get_ticks()
         
         pygame.display.set_mode(self.DISPLAY_SIZE)
         self.display = pygame.display.get_surface()
@@ -89,5 +92,16 @@ class view(object):
                     buttonText = self.M.getButton(event.pos[0] - self.menuX, event.pos[1])
                     if buttonText != None:
                         print(buttonText)   
+                        
+        return self
 
+    def processUserEvents(self):
+        if(pygame.time.get_ticks()-self.oldTime >= 2000):
+            self.oldTime = pygame.time.get_ticks()
+            self.UEH.handleEvents()
+    
+    def processEvents(self):
+        V = self.processPygameEvents()
+        self.processUserEvents()
+        return V
         

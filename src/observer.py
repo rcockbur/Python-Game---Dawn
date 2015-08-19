@@ -2,10 +2,10 @@ class Observer(object):
     def __init__(self):
         self.viewList = list()
         
-    def addView(self, view):
-        self.viewList.append(view)
+    def addView(self, gameView):
+        self.viewList.append(gameView)
         
     def notifyViews(self):
-        for view in self.viewList:
-            view.notifyUpdate()
+        for gameView in self.viewList:
+            gameView.notifyUpdate()
         
