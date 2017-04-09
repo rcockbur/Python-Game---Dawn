@@ -1,4 +1,5 @@
-import person, random
+from models.person import Person 
+import random
 
 class personController(object):
     
@@ -24,7 +25,7 @@ class personController(object):
             gender = self.randomGender()
         if (name == None):
             name = self.randomName(gender)
-        self.everyone[self.count] = person.Person(self.count, day, mID, fID, gender, name)
+        self.everyone[self.count] = Person(self.count, day, mID, fID, gender, name)
         self.living.add(self.count)
         if (mID != None):
             self.everyone[mID].addKid(self.count)

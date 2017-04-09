@@ -18,7 +18,7 @@ class eventController(object):
     def __init__(self):
         self.month = 0
         self.schedule = dict()
-#         self.createAdamEve()
+        self.createAdamEve()
         
     def addPlan(self, plan):
         month = plan[0]
@@ -50,21 +50,21 @@ class eventController(object):
         return random.randint(1, 12*5)
 
     def createAdamEve(self):
-        event = (self.CREATE, {"momID": None, "dadID": None, "gender": "male", "name": "Adam"})    
+        event = (self.CREATE, {"fID": None, "mID": None, "gender": "male", "name": "Adam"})    
         self.addPlan((0, event))
-        event = (self.CREATE, {"momID": None, "dadID": None, "gender": "female", "name": "Eve"})
+        event = (self.CREATE, {"fID": None, "mID": None, "gender": "female", "name": "Eve"})
         self.addPlan((0, event))
         
     def planAdulthood(self, pID):
         event = (self.ADULTHOOD, {"pID": pID})
         self.addPlan((self.month + self.MONTHS_AS_CHILD, event))
         
-    def planBirth(self, momID, dadID):
-        event = (self.BIRTH, {"dadID": dadID, "momID": momID, "gender": None, "name": None})
+    def planBirth(self, fID, mID):
+        event = (self.BIRTH, {"mID": mID, "fID": fID, "gender": None, "name": None})
         self.addPlan((self.month + self.MONTHS_PREGNANT, event))
         
-    def planPregnancy(self, momID, dadID):
-        event = (self.PREGNANT, {"dadID": dadID, "momID": momID})
+    def planPregnancy(self, fID, mID):
+        event = (self.PREGNANT, {"mID": mID, "fID": fID})
         self.addPlan((self.month + self.monthsToConveive(), event))
         
     def planDeath(self, pID, maxLife):

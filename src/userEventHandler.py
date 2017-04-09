@@ -1,6 +1,6 @@
 # from pygame import USEREVENT
-from eventController import eventController
-from personController import personController
+from controllers.eventController import eventController
+from controllers.personController import personController
 
 MARRIAGE = 1
 BIRTHDAY = 2
@@ -23,7 +23,6 @@ class UserEventHandler(object):
     def handleEvents(self):
         print(self.EC.month)
         for event in self.EC.getTodaysEvents():
-
             if event[0] == CREATE:
                 pID = self.PC.birth(self.EC.month, event[1]['mID'], event[1]['fID'], event[1]['gender'], event[1]['name'])
                 self.EC.planAdulthood(pID)
